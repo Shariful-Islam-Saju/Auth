@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
+import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased  bg-gray-100`}
       >
-        <MaxWidthWrapper>{children}</MaxWidthWrapper>
+        <Navbar />
+        <MaxWidthWrapper className="mt-20">{children}</MaxWidthWrapper>
       </body>
     </html>
   );
