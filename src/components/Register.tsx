@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import axios from "axios";
 import Link from "next/link";
 
 interface FormData {
@@ -26,13 +27,23 @@ export default function RegisterForm() {
     password: "",
   });
 
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+
   const handleChange = (e: ChangeEvent) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Submitted", formData);
+    setIsDisabled(true);
+
+    try {
+      await axios.post("/api/register", formData);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsDisabled(false);
+    }
   };
 
   return (
@@ -44,7 +55,7 @@ export default function RegisterForm() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}  className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name">Name</Label>
               <Input
@@ -84,7 +95,7 @@ export default function RegisterForm() {
                 className="w-full"
               />
             </div>
-            <Button type="submit" className="w-full sm:text-lg">
+            <Button disabled={isDisabled} type="submit" className="w-full sm:text-lg">
               Register
             </Button>
           </form>

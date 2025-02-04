@@ -7,6 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import axios from "axios";
 
 interface FormData {
   email: string;
@@ -18,16 +19,24 @@ export default function LoginForm() {
     email: "",
     password: "",
   });
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Login Submitted", formData);
-  };
+    setIsDisabled(true);
 
+    try {
+      await axios.post("/api/register", formData);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsDisabled(false);
+    }
+  };
   const signIn = (provider: string) => {
     console.log("Sign in with ", provider);
   };
@@ -68,7 +77,7 @@ export default function LoginForm() {
                 className="w-full"
               />
             </div>
-            <Button type="submit" className="w-full sm:text-lg">
+            <Button disabled={isDisabled} type="submit" className="w-full sm:text-lg">
               Login
             </Button>
           </form>
