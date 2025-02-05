@@ -22,8 +22,10 @@ const Navbar = () => {
             </Link>
             <Link href="/login" className="">
               Login
+            </Link>{" "}
+            <Link href="/logout" className="">
+              Logout
             </Link>
-           
           </div>
         </div>
       </MaxWidthWrapper>
