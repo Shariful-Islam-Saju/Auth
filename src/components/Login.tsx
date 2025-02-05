@@ -30,7 +30,7 @@ export default function LoginForm() {
     setIsDisabled(true);
 
     try {
-      await axios.post("/api/register", formData);
+      await axios.post("/api/login", formData);
     } catch (error) {
       console.error("Error:", error);
     } finally {

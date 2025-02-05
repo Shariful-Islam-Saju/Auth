@@ -1,20 +1,29 @@
+import { signIn } from "@/auth";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    // Parse incoming form data
-    const formData = await req.json();
-    console.log(formData);
+    const { email, password } = await req.json();
 
-    // Simulate saving to a database (replace with actual DB logic)
+    const result = await signIn("credentials", {
+      redirect: false, // Ensure it does not redirect
+      email,
+      password,
+    });
+
+    // Check for errors in the result
+    if (result?.error) {
+      return NextResponse.json({ error: result.error }, { status: 401 });
+    }
+
     return NextResponse.json(
-      { message: "User found successfully" },
-      { status: 201 }
+      { message: "Login successful", result },
+      { status: 200 }
     );
   } catch (error) {
-    console.error("Error occurred:", error);
+    console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Something went wrong" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

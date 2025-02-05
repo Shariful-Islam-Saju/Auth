@@ -1,6 +1,13 @@
 import db from "@/lib/db";
 import User from "@/model/user";
 import { NextResponse } from "next/server";
+import  { hash } from 'bcryptjs'
+// Function to validate form data
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+}
 
 // Updated POST function
 export async function POST(req: Request) {
@@ -38,13 +45,6 @@ export async function POST(req: Request) {
   }
 }
 
-// Function to validate form data
-interface FormData {
-  name: string;
-  email: string;
-  password: string;
-}
-
 function validateFormData(formData: FormData) {
   const { name, email, password } = formData;
   if (!name || !email || !password) {
@@ -65,10 +65,12 @@ async function saveUserToDatabase(formData: FormData) {
   if (existingUser) {
     throw new Error("User with this email already exists");
   }
+
+  const hashedPassword = await hash(formData.password, 10)
   const newUser = await new User({
     name: formData.name,
     email: formData.email,
-    password: formData.password,
+    password: hashedPassword, 
     authProviderId: "local",
     role: "user",
   });
