@@ -1,6 +1,8 @@
-// components/Navbar.tsx
+"use client";
 import Link from "next/link";
 import MaxWidthWrapper from "./MaxWidthWrapper";
+import { Button } from "./ui/button";
+import { signOut } from "next-auth/react";
 
 const Navbar = () => {
   return (
@@ -23,9 +25,13 @@ const Navbar = () => {
             <Link href="/login" className="">
               Login
             </Link>{" "}
-            <Link href="/logout" className="">
+            <Button
+              onClick={() => {
+                signOut();
+              }}
+            >
               Logout
-            </Link>
+            </Button>
           </div>
         </div>
       </MaxWidthWrapper>

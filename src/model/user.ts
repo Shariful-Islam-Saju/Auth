@@ -11,7 +11,6 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
   },
   role: {
     type: String,
@@ -20,6 +19,9 @@ const userSchema = new Schema({
   authProviderId: {
     type: String,
   },
+  image: {
+    type: String
+  }
 });
 
 const User = mongoose.models?.User || mongoose.model("User", userSchema);

@@ -64,4 +64,61 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/login",
   },
+  callbacks: {
+    session: async function ({ session, token }) {
+      if (token?.sub) {
+        session.user.id = token.sub;
+      }
+
+      if (token?.role) {
+        session.user.role = token.role;
+      }
+
+      return session;
+    },
+
+    jwt: async function ({ token, user }) {
+      if (user) {
+        token.role = user.role; // Assign user role to token
+      }
+      return token;
+    },
+
+    signIn: async function ({ account, user }) {
+      if (!account) return false;
+
+      try {
+        await db();
+
+        if (account.provider === "google") {
+          const { image, email, name } = user;
+
+          if (!email) {
+            console.error("Google sign-in failed: Email is missing.");
+            return false;
+          }
+
+          const existingUser = await User.findOne({ email });
+
+          if (!existingUser) {
+            console.log("This user not found");
+
+            console.log("This is account", account);
+            console.log("This is user", user);
+          }
+
+          return true;
+        }
+
+        if (account.provider === "credentials") {
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        console.error("Sign-in error:", error);
+        return false;
+      }
+    },
+  },
 });

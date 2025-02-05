@@ -71,7 +71,6 @@ async function saveUserToDatabase(formData: FormData) {
     name: formData.name,
     email: formData.email,
     password: hashedPassword, 
-    authProviderId: "local",
     role: "user",
   });
 

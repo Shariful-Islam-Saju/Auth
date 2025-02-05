@@ -6,12 +6,13 @@ export async function POST(req: Request) {
     const { email, password } = await req.json();
 
     const result = await signIn("credentials", {
-      redirect: false, // Ensure it does not redirect
+      redirect: false, // Prevents automatic redirection
+      callbackUrl: "/", // Correct property name
       email,
       password,
     });
 
-    // Check for errors in the result
+    // Check for an error in the response
     if (result?.error) {
       return NextResponse.json({ error: result.error }, { status: 401 });
     }
