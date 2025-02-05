@@ -8,6 +8,7 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import axios from "axios";
+import {signIn} from 'next-auth/react'
 
 interface FormData {
   email: string;
@@ -37,9 +38,7 @@ export default function LoginForm() {
       setIsDisabled(false);
     }
   };
-  const signIn = (provider: string) => {
-    console.log("Sign in with ", provider);
-  };
+
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
