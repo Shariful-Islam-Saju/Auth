@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import LoginForm from "@/components/Login";
+import { redirect } from "next/navigation";
 import React from "react";
 export const metadata = {
   title: "Login",
@@ -7,7 +8,9 @@ export const metadata = {
 
 const page = async () => {
   const session = await auth();
-  console.log("This is Session in Login Page", session);
+  if (session?.user) {
+    redirect("/");
+  }
   return <LoginForm />;
 };
 

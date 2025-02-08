@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      { message: "Login successful", result },
+      { message: "Login successful", result, redirect: "/" },
       { status: 200 }
     );
   } catch (error) {

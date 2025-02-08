@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import Navbar from "@/components/Navbar";
+import Provider from "@/components/Provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased  bg-gray-100`}
       >
-        <Navbar />
-        <MaxWidthWrapper className="mt-20">{children}</MaxWidthWrapper>
+        <Provider>
+          <Navbar />
+          <MaxWidthWrapper className="mt-20">{children}</MaxWidthWrapper>
+        </Provider>
       </body>
     </html>
   );

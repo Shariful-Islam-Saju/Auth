@@ -8,7 +8,8 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import axios from "axios";
-import {signIn} from 'next-auth/react'
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   email: string;
@@ -21,6 +22,7 @@ export default function LoginForm() {
     password: "",
   });
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,14 +33,14 @@ export default function LoginForm() {
     setIsDisabled(true);
 
     try {
-      await axios.post("/api/login", formData);
+      const response = await axios.post("/api/login", formData);
+      router.push(response.data.redirect);
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setIsDisabled(false);
     }
   };
-
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -76,7 +78,11 @@ export default function LoginForm() {
                 className="w-full"
               />
             </div>
-            <Button disabled={isDisabled} type="submit" className="w-full sm:text-lg">
+            <Button
+              disabled={isDisabled}
+              type="submit"
+              className="w-full sm:text-lg"
+            >
               Login
             </Button>
           </form>

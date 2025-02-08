@@ -1,6 +1,12 @@
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/register");
+  }
   return (
     <div>
       <p>
@@ -53,9 +59,7 @@ export default async function Home() {
         voluptatibus.
       </p>
       <div className="flex justify-center my-5">
-        <Button  variant={"default"}>
-          Click Me
-        </Button>
+        <Button variant={"default"}>Click Me</Button>
       </div>
     </div>
   );
