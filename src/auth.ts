@@ -63,8 +63,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.role = user.role;
       }
-      console.log("This is Token", token);
-      console.log("This is user", user);
 
       return token;
     },
@@ -73,7 +71,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.sub;
       }
       if (token?.role) {
-        session.user.role = token.role;
+        session.user.role = String(token.role);
       }
       return session;
     },
@@ -103,7 +101,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return true;
         }
 
-        return account.provider === "credentials";
+        if (account.provider === "credentials") {
+          return true;
+        }
+
+        return false;
       } catch {
         return false;
       }
