@@ -1,10 +1,11 @@
-import NextAuth, { CredentialsSignin } from "next-auth";
+import NextAuth from "next-auth";
 import credentials from "next-auth/providers/credentials";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import db from "./lib/db";
 import User from "./model/user";
 import { compare } from "bcryptjs";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     credentials({
@@ -22,34 +23,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credential.password as string | undefined;
 
         if (!email || !password) {
-          throw new CredentialsSignin("Please provide Email and Password");
+          throw new Error("Please provide Email and Password");
         }
 
         await db();
         const user = await User.findOne({ email }).select("+password +role");
 
-        if (!user) {
-          throw new CredentialsSignin("User not found");
+        if (
+          !user ||
+          !user.password ||
+          !(await compare(password, user.password))
+        ) {
+          throw new Error("Invalid credentials");
         }
 
-        if (!user.password) {
-          throw new CredentialsSignin("User not found");
-        }
-
-        const isMatched = await compare(password, user.password);
-
-        if (!isMatched) {
-          throw new CredentialsSignin("User not found");
-        }
-
-        const userData = {
+        return {
           name: user.name,
           email: user.email,
           role: user.role,
           id: user._id,
         };
-
-        return userData;
       },
     }),
     Github({
@@ -65,58 +58,53 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/login",
   },
   callbacks: {
-    session: async function ({ session, token }) {
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      console.log("This is Token", token);
+      console.log("This is user", user);
+
+      return token;
+    },
+    session: async ({ session, token }) => {
       if (token?.sub) {
         session.user.id = token.sub;
       }
-
       if (token?.role) {
         session.user.role = token.role;
       }
-
       return session;
     },
-
-    jwt: async function ({ token, user }) {
-      if (user) {
-        token.role = user.role; // Assign user role to token
-      }
-      return token;
-    },
-
-    signIn: async function ({ account, user }) {
+    signIn: async ({ account, user }) => {
       if (!account) return false;
 
       try {
         await db();
 
         if (account.provider === "google") {
-          const { image, email, name } = user;
+          const { email, id, name } = user;
+          if (!email) return false;
 
-          if (!email) {
-            console.error("Google sign-in failed: Email is missing.");
-            return false;
-          }
-
-          const existingUser = await User.findOne({ email });
+          let existingUser = await User.findOne({ email });
 
           if (!existingUser) {
-            console.log("This user not found");
-
-            console.log("This is account", account);
-            console.log("This is user", user);
+            existingUser = await User.create({
+              name,
+              email,
+              authProviderId: id,
+              role: "user",
+            });
           }
 
+          user.role = existingUser.role;
+
           return true;
         }
 
-        if (account.provider === "credentials") {
-          return true;
-        }
-
-        return false;
-      } catch (error) {
-        console.error("Sign-in error:", error);
+        return account.provider === "credentials";
+      } catch {
         return false;
       }
     },

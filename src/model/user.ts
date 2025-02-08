@@ -19,9 +19,7 @@ const userSchema = new Schema({
   authProviderId: {
     type: String,
   },
-  image: {
-    type: String
-  }
+
 });
 
 const User = mongoose.models?.User || mongoose.model("User", userSchema);
